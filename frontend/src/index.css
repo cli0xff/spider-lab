@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #004532;
+  --color-primary-container: #065f46;
+  --color-primary-fixed: #a6f2d1;
+  --color-primary-fixed-dim: #8bd6b6;
+  --color-secondary: #515f74;
+  --color-secondary-container: #d5e3fc;
+  --color-tertiary: #652925;
+  --color-tertiary-container: #823f3a;
+  --color-tertiary-fixed: #ffdad6;
+  --color-surface: #f7f9fb;
+  --color-surface-dim: #d8dadc;
+  --color-surface-container: #eceef0;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+  --color-surface-container-lowest: #ffffff;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-outline: #6f7973;
+  --color-outline-variant: #bec9c2;
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #3f4944;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #8bd6b7;
+  --color-on-secondary-container: #57657a;
+  --color-on-error-container: #93000a;
+  --font-family-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse-live {
+  animation: pulse-live 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.glass-header {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.tonal-depth {
+  box-shadow: 0 4px 20px 0 rgba(0, 69, 50, 0.04);
+}
+
+.shadow-editorial {
+  box-shadow: 0 4px 20px 0 rgba(0, 69, 50, 0.04), 0 12px 40px 0 rgba(0, 0, 0, 0.08);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e0e3e5;
+  border-radius: 10px;
+}
+
+/* WeChat Article Content Styling */
+.wechat-article-content {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333;
+}
+
+.wechat-article-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.wechat-article-content p {
+  margin: 16px 0;
+  text-align: justify;
+}
+
+.wechat-article-content h1,
+.wechat-article-content h2,
+.wechat-article-content h3 {
+  margin: 24px 0 16px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.wechat-article-content h1 {
+  font-size: 24px;
+}
+
+.wechat-article-content h2 {
+  font-size: 20px;
+}
+
+.wechat-article-content h3 {
+  font-size: 18px;
+}
+
+.wechat-article-content ul,
+.wechat-article-content ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.wechat-article-content li {
+  margin: 8px 0;
+}
+
+.wechat-article-content blockquote {
+  margin: 16px 0;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-left: 4px solid #004532;
+  border-radius: 4px;
+}
+
+.wechat-article-content a {
+  color: #004532;
+  text-decoration: none;
+}
+
+.wechat-article-content a:hover {
+  text-decoration: underline;
+}
+
+.wechat-article-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.wechat-article-content th,
+.wechat-article-content td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.wechat-article-content th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.wechat-article-content pre {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.wechat-article-content code {
+  background-color: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 14px;
+}

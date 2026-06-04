@@ -1,0 +1,122 @@
+services:
+  master:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        TARGET: master
+    container_name: spider-lab-master
+    ports:
+      - "8080:8080"
+      - "9666:9666"
+    environment:
+      - SPIDER_LAB_MASTER=true
+      - SPIDER_LAB_MONGO_URI=mongodb://mongo:27017
+      - SPIDER_LAB_MONGO_DB=spider_lab
+      - SPIDER_LAB_GRPC_ADDRESS=0.0.0.0:9666
+      - SPIDER_LAB_API_ADDRESS=0.0.0.0:8080
+      - SPIDER_LAB_JWT_SECRET=your-production-secret-key
+      - SPIDER_LAB_MAX_RUNNERS=8
+      - SPIDER_LAB_SPIDER_DIR=/app/spiders
+      - SPIDER_LAB_STORAGE_ENDPOINT=storage:9000
+      - SPIDER_LAB_STORAGE_ACCESS_KEY=spider-lab
+      - SPIDER_LAB_STORAGE_SECRET_KEY=spider-lab-secret
+      - SPIDER_LAB_STORAGE_BUCKET=spider-lab
+      - SPIDER_LAB_STORAGE_USE_SSL=false
+    depends_on:
+      mongo:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+    volumes:
+      - spider-data:/app/spiders
+    restart: unless-stopped
+    networks:
+      - spider-lab
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        TARGET: worker
+    container_name: spider-lab-worker-01
+    environment:
+      - SPIDER_LAB_MASTER=false
+      - SPIDER_LAB_MASTER_GRPC=master:9666
+      - SPIDER_LAB_MAX_RUNNERS=8
+      - SPIDER_LAB_SPIDER_DIR=/app/spiders
+      - SPIDER_LAB_STORAGE_ENDPOINT=storage:9000
+      - SPIDER_LAB_STORAGE_ACCESS_KEY=spider-lab
+      - SPIDER_LAB_STORAGE_SECRET_KEY=spider-lab-secret
+      - SPIDER_LAB_STORAGE_BUCKET=spider-lab
+      - SPIDER_LAB_STORAGE_USE_SSL=false
+    depends_on:
+      - master
+      - storage
+    volumes:
+      - spider-data:/app/spiders
+    restart: unless-stopped
+    networks:
+      - spider-lab
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: spider-lab-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://master:8080
+    depends_on:
+      - master
+    restart: unless-stopped
+    networks:
+      - spider-lab
+
+  mongo:
+    image: mongo:7
+    container_name: spider-lab-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - spider-lab
+
+  storage:
+    image: minio/minio:latest
+    container_name: spider-lab-storage
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=spider-lab
+      - MINIO_ROOT_PASSWORD=spider-lab-secret
+    volumes:
+      - storage-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - spider-lab
+
+volumes:
+  mongo-data:
+  spider-data:
+  storage-data:
+
+networks:
+  spider-lab:
+    driver: bridge

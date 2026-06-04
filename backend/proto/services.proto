@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "github.com/crawlab-team/spider-lab/proto";
+
+// ==================== Node Service ====================
+service NodeService {
+  rpc Register(NodeRegisterRequest) returns (NodeRegisterResponse);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  rpc Subscribe(stream StreamMessage) returns (stream StreamMessage);
+  rpc GetNodeInfo(NodeInfoRequest) returns (NodeInfoResponse);
+}
+
+// ==================== Task Service ====================
+service TaskService {
+  rpc AssignTask(TaskAssignRequest) returns (TaskAssignResponse);
+  rpc CancelTask(TaskCancelRequest) returns (TaskCancelResponse);
+  rpc ReportTaskStatus(TaskStatusReport) returns (TaskStatusResponse);
+  rpc StreamLogs(stream LogMessage) returns (LogAck);
+}
+
+// ==================== Spider Service ====================
+service SpiderService {
+  rpc DeploySpider(SpiderDeployRequest) returns (SpiderDeployResponse);
+  rpc SyncFiles(stream FileChunk) returns (SyncResponse);
+}
+
+// ==================== Messages ====================
+
+message StreamMessage {
+  string code = 1;
+  string node_key = 2;
+  bytes data = 3;
+  int64 timestamp = 4;
+}
+
+// Node messages
+message NodeRegisterRequest {
+  string key = 1;
+  string name = 2;
+  string ip = 3;
+  int32 port = 4;
+  bool is_master = 5;
+  int32 max_runners = 6;
+  string description = 7;
+}
+
+message NodeRegisterResponse {
+  bool success = 1;
+  string node_id = 2;
+  string message = 3;
+}
+
+message HeartbeatRequest {
+  string node_key = 1;
+  double cpu_usage = 2;
+  double memory_usage = 3;
+  double disk_usage = 4;
+  int32 active_runners = 5;
+  int32 available_runners = 6;
+}
+
+message HeartbeatResponse {
+  bool success = 1;
+  int64 timestamp = 2;
+}
+
+message NodeInfoRequest {
+  string node_key = 1;
+}
+
+message NodeInfoResponse {
+  string node_id = 1;
+  string name = 2;
+  string status = 3;
+  double cpu_usage = 4;
+  double memory_usage = 5;
+  int32 active_runners = 6;
+  int32 max_runners = 7;
+}
+
+// Task messages
+message TaskAssignRequest {
+  string task_id = 1;
+  string spider_id = 2;
+  string cmd = 3;
+  string param = 4;
+  int32 priority = 5;
+}
+
+message TaskAssignResponse {
+  bool accepted = 1;
+  string message = 2;
+}
+
+message TaskCancelRequest {
+  string task_id = 1;
+  string reason = 2;
+}
+
+message TaskCancelResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message TaskStatusReport {
+  string task_id = 1;
+  string node_key = 2;
+  string status = 3;
+  string error = 4;
+  int32 pid = 5;
+  int64 start_ts = 6;
+  int64 end_ts = 7;
+  int64 result_count = 8;
+}
+
+message TaskStatusResponse {
+  bool acknowledged = 1;
+}
+
+message LogMessage {
+  string task_id = 1;
+  string node_key = 2;
+  string content = 3;
+  int64 timestamp = 4;
+  string level = 5;
+}
+
+message LogAck {
+  bool success = 1;
+  int64 lines_received = 2;
+}
+
+// Spider/File messages
+message SpiderDeployRequest {
+  string spider_id = 1;
+  string node_key = 2;
+}
+
+message SpiderDeployResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message FileChunk {
+  string spider_id = 1;
+  string file_path = 2;
+  bytes data = 3;
+  int64 offset = 4;
+  bool is_last = 5;
+}
+
+message SyncResponse {
+  bool success = 1;
+  int32 files_synced = 2;
+}
